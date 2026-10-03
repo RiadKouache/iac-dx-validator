@@ -1,6 +1,6 @@
 name: 'Terraform CI/CD Pipeline'
 
-# Pipeline se déclence à chaque modification du code (push)
+# Pipeline se déclenche à chaque modification du code (push)
 on:
   push:
     branches:
@@ -9,22 +9,30 @@ on:
 jobs:
   terraform:
     name: 'Terraform Validation & Plan'
-    # Le Runner est un serveur Ubuntu vierge fourni par GitHub
     runs-on: ubuntu-latest
 
     steps:
-      # 1. télécharger le code Terraform (main.tf) depuis mon dépot
       - name: 'Checkout du code'
         uses: actions/checkout@v4
 
-      # installation du binaire Terraform sur le serveur
       - name: 'Installation de Terraform'
-       uses: hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v3
 
-      # Config des identifiants AWS via les GitHub Secrets
       - name: 'Configuration AWS Credentials'
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-access-key-id: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-secret-access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: eu-west-3
+
+      - name: 'Terraform Format'
+        run: terraform fmt -check
+
+      - name: 'Terraform Init'
+        run: terraform init
+
+      - name: 'Terraform Validate'
+        run: terraform validate
+
+      - name: 'Terraform Plan'
+        run
