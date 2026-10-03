@@ -1,0 +1,30 @@
+name: 'Terraform CI/CD Pipeline'
+
+# Pipeline se déclence à chaque modification du code (push)
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  terraform:
+    name: 'Terraform Validation & Plan'
+    # Le Runner est un serveur Ubuntu vierge fourni par GitHub
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. télécharger le code Terraform (main.tf) depuis mon dépot
+      - name: 'Checkout du code'
+        uses: actions/checkout@v4
+
+      # installation du binaire Terraform sur le serveur
+      - name: 'Installation de Terraform'
+       uses: hashicorp/setup-terraform@v3
+
+      # Config des identifiants AWS via les GitHub Secrets
+      - name: 'Configuration AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-access-key-id: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3

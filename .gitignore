@@ -1,0 +1,7 @@
+# Dossiers de plugins locaux 
+.terraform/
+
+# Fichiers d'état locaux (sécurité)
+*.tfstate
+*.tfstate.*
+
