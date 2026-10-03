@@ -35,4 +35,8 @@ jobs:
         run: terraform validate
 
       - name: 'Terraform Plan'
-        run
+        run: terraform plan
+
+      - name: 'Terraform apply'
+        # l'option permet le "yes" auto pour agir sur l'infra
+        run: terraform apply -auto-approve
