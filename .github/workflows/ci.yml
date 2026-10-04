@@ -11,6 +11,12 @@ jobs:
     name: 'Terraform Validation & Plan'
     runs-on: ubuntu-latest
 
+    # Faire en sorte que les commandes (run) s'exécutent dans le dossier voulu 
+    defaults:
+      run:
+        working-directory: ./01-vpc
+
+
     steps:
       - name: 'Checkout du code'
         uses: actions/checkout@v4
