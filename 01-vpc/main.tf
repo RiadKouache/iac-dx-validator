@@ -69,7 +69,7 @@ resource "aws_nat_gateway" "nat_gw" {
   allocation_id = aws_eip.nat_eip.id
   subnet_id     = aws_subnet.main_public_subnet.id
   # Attendre la construction de la gateway internet avant de créer le NAT
-  depends_on    = [aws_internet_gateway.gw]
+  depends_on = [aws_internet_gateway.gw]
 }
 
 # Table de Routage R2 (private)
