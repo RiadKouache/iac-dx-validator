@@ -23,22 +23,36 @@ provider "aws" {
 # Create a VPC
 resource "aws_vpc" "main_vpc" {
   cidr_block = "10.0.0.0/16"
+
+  tags = {
+	Name = "main_vpc"  
+  }
 }
 
 resource "aws_subnet" "main_public_subnet" {
   vpc_id            = aws_vpc.main_vpc.id
   cidr_block        = "10.0.1.0/24"
   availability_zone = "eu-west-3a"
+
+  tags = {
+	Name = "main_public_subnet"
+  }
 }
 
 resource "aws_subnet" "main_private_subnet" {
   vpc_id            = aws_vpc.main_vpc.id
   cidr_block        = "10.0.2.0/24"
   availability_zone = "eu-west-3a"
+  tags = {
+        Name = "main_private_subnet"
+  }
 }
 
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main_vpc.id
+  tags = {
+        Name = "internet_gw"
+  }
 }
 
 # Table de Routage R1 (public)
@@ -50,6 +64,10 @@ resource "aws_route_table" "R1" {
     cidr_block = "0.0.0.0/0"
     # Alors passer par la gateway internet
     gateway_id = aws_internet_gateway.gw.id
+  }
+
+  tags = {
+        Name = "R1"
   }
 }
 
@@ -70,6 +88,10 @@ resource "aws_nat_gateway" "nat_gw" {
   subnet_id     = aws_subnet.main_public_subnet.id
   # Attendre la construction de la gateway internet avant de créer le NAT
   depends_on = [aws_internet_gateway.gw]
+
+  tags = {
+        Name = "nat_gw"
+  }
 }
 
 # Table de Routage R2 (private)
@@ -79,6 +101,10 @@ resource "aws_route_table" "R2" {
   route {
     cidr_block     = "0.0.0.0/0"
     nat_gateway_id = aws_nat_gateway.nat_gw.id
+  }
+  
+  tags = {
+        Name = "R2"
   }
 }
 
