@@ -113,3 +113,63 @@ resource "aws_route_table_association" "A2" {
   subnet_id      = aws_subnet.main_private_subnet.id
   route_table_id = aws_route_table.R2.id
 }
+
+# Security Groups 
+
+## Vigile du Frontend (Public) 
+
+resource "aws_security_group" "frontend_sg" {
+  name        = "frontend_sg"
+  description = "Autorise le trafic HTTP entrant depuis Internet"
+  vpc_id      = aws_vpc.main_vpc.id
+
+  # Règle entrante (Ingress) : Autorise port 80 depuis n'importe où
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Règle sortante (Egress) : Autorise le serveur à parler à tout le monde (nécessaire pour télécharger des paquets ou répondre aux clients)
+  egress {
+    from_port = 0
+    to_port   = 0
+    # tous les protocoles
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "frontend_sg"
+  }
+}
+
+## Vigile du Backend (Private)
+
+resource "aws_security_group" "backend_sg" {
+  name        = "backend_sg"
+  description = "Autorise le trafic 8000 entrant depuis le frontend"
+  vpc_id      = aws_vpc.main_vpc.id
+
+  # Règle entrante (Ingress) : autorise le port 8000 depuis le frontend
+  ingress {
+    from_port       = 8000
+    to_port         = 8000
+    protocol        = "tcp"
+    security_groups = [aws_security_group.frontend_sg.id]
+  }
+
+  # Règle sortante (Egress) : autorise le serveur à parler à tout le monde
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "backend_sg"
+  }
+}
