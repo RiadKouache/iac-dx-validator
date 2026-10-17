@@ -22,11 +22,11 @@ resource "aws_iam_role" "backend_role" {
 }
 
 resource "aws_iam_role_policy_attachment" "backend_s3_read" {
-	role = aws_iam_role.backend_role.name
-	policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
+  role       = aws_iam_role.backend_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
 }
 
 resource "aws_iam_instance_profile" "backend_profile" {
-	name = "backend_profile"
-	role = aws_iam_role.backend_role.name
+  name = "backend_profile"
+  role = aws_iam_role.backend_role.name
 }
