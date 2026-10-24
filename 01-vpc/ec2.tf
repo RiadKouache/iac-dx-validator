@@ -15,6 +15,9 @@ resource "aws_instance" "backend_server" {
   # On lui donne son uniforme IAM (le porte-badge)
   iam_instance_profile = aws_iam_instance_profile.backend_profile.name
 
+  # Lire le contenu du script bash d'initialisation de l'instance backend
+  user_data = file("${path.module}/scripts/script_initialisation_backend.sh")
+
   tags = {
     Name = "backend_server"
   }
@@ -27,6 +30,12 @@ resource "aws_instance" "frontend_server" {
   subnet_id = aws_subnet.main_public_subnet.id
 
   vpc_security_group_ids = [aws_security_group.frontend_sg.id]
+
+  # Forcer AWS à lui attribuer une IP publique : 
+  associate_public_ip_address = true
+
+  # Lire le contenu du script bash d'initialisation de l'instance frontend
+  user_data = templatefile("${path.module}/scripts/script_initialisation_frontend.sh", { backend_private_ip = aws_instance.backend_server.private_ip })
 
   tags = {
     Name = "frontend_server"
