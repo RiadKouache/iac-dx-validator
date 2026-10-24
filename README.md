@@ -57,7 +57,7 @@ Le client accède à l'IP publique du Frontend. Nginx intercepte la requête HTT
 ### 2. Observabilité et Télémétrie SRE
 Le serveur d'observabilité (Public) parvient à traverser le réseau pour interroger (scrape) l'API privée sur la route `/metrics`.
 
-![Prometheus Targets](images/prometheus.png)
+![Prometheus Targets](images/prometheus_targets.png)
 *(Capture 4 : Prometheus confirmant la liaison réseau vers l'API privée (Status: UP))*
 
 Les métriques sont ensuite agrégées et visualisées sur Grafana en temps réel (Taux de réussite HTTP, temps de réponse, consommation CPU/RAM).
