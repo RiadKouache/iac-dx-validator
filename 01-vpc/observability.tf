@@ -26,6 +26,10 @@ resource "aws_security_group" "obs_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  tags = {
+    Name = "obs_sg"
+  }
+
 }
 
 
@@ -44,4 +48,8 @@ resource "aws_instance" "obs_server" {
 
   # Script d'initialisation du serveur d'observabilité 
   user_data = templatefile("${path.module}/scripts/script_initialisation_obs.sh", { backend_private_ip = aws_instance.backend_server.private_ip })
+
+  tags = {
+    Name = "obs_server"
+  }
 }
