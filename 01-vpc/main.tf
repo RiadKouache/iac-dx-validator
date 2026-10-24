@@ -154,10 +154,12 @@ resource "aws_security_group" "backend_sg" {
 
   # Règle entrante (Ingress) : autorise le port 8000 depuis le frontend
   ingress {
-    from_port       = 8000
-    to_port         = 8000
-    protocol        = "tcp"
-    security_groups = [aws_security_group.frontend_sg.id]
+    from_port = 8000
+    to_port   = 8000
+    protocol  = "tcp"
+    security_groups = [aws_security_group.frontend_sg.id,
+      aws_security_group.obs_sg.id
+    ]
   }
 
   # Règle sortante (Egress) : autorise le serveur à parler à tout le monde
