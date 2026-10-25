@@ -112,6 +112,7 @@ Pour protéger le coffre-fort Terraform (S3/DynamoDB) d'une destruction accident
 │   └── frontend/               # Code source Vue.js
 │
 └── .github/workflows/ci.yml    # 🤖 PIPELINE CI : terraform validate/plan sur 01-vpc/
+```
 
 ## ⚙️ Comment reproduire ce projet (Quick Start)
 
@@ -122,6 +123,7 @@ Pour protéger le coffre-fort Terraform (S3/DynamoDB) d'une destruction accident
 cd 00-backend
 terraform init
 terraform apply -auto-approve
+```
 
 **2. Déployer l'infrastructure réseau et applicative**
 
@@ -130,12 +132,13 @@ cd ../01-vpc
 terraform init
 # Les adresses IP publiques de Grafana et du Frontend s'afficheront dans les Outputs.
 terraform apply
+```
 
 **3. Nettoyage FinOps (Destruction)**
 Pour éviter toute facturation AWS inutile, détruire l'environnement réseau après utilisation :
 
 ```bash
 terraform destroy
-
+```
 (Note : Ne jamais lancer cette commande dans le dossier 00-backend sous peine de détruire le fichier d'état !)
 
