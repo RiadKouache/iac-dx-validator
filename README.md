@@ -30,6 +30,24 @@ La sécurité ne repose pas sur le filtrage d'IP locales, mais sur l'identité d
 ![Security Group Backend](images/backend_sg_ingress.png)
 *(Capture 2 : Règles Ingress du Backend interdisant l'accès public)*
 
+### 3. La Sécurité des Identités (IAM)
+Le principe du moindre privilège est appliqué au niveau des machines elles-mêmes :
+- **Zéro clé en dur :** Aucune clé d'accès AWS n'est stockée ou injectée sur les serveurs EC2.
+- **Instance Profiles :** Le serveur Backend s'authentifie de manière autonome et temporaire auprès des autres services AWS grâce à un rôle IAM dédié (déclaré dans `iam.tf`). Ce rôle lui est attaché via un *Instance Profile*, garantissant une sécurité d'infrastructure optimale.
+- **Moindre Privilège :** Une politique stricte en lecture seule (`AmazonS3ReadOnlyAccess`) lui est rattachée, lui permettant de consulter des assets de configuration sans jamais posséder de droits de modification sur l'infrastructure.
+
+![Preuve IAM EC2](images/backend_role.png)
+*(Capture : Le serveur Backend (EC2) endossant son identité IAM autonome)*
+
+![Preuve Permissions IAM](images/backend_role_permissions.png)
+*(Capture : Les permissions strictes (Read Only) attachées au rôle du Backend)*
+
+### 4. CI/CD & Gestion des Secrets
+Le pipeline GitHub Actions valide (`fmt`, `validate`) et planifie le code à chaque push sur la branche `main`. Pour garantir un pipeline **Zero-Trust**, aucune clé AWS n'est codée en dur. L'authentification du runner GitHub se fait via des clés éphémères injectées dynamiquement depuis le coffre-fort chiffré **GitHub Secrets**.
+
+### 5. Infrastructure Immuable (No-SSH)
+Les instances EC2 sont déployées de manière entièrement "Headless". Les ports SSH (22) sont fermés et aucune clé de connexion n'est provisionnée. La configuration complète (installation du moteur Docker, injection des variables réseau, lancement des conteneurs) est automatisée à 100% lors du premier démarrage via le processus `cloud-init` (scripts bash `user_data`).
+
 ---
 
 ## 🛠️ Stack Technique
@@ -94,3 +112,30 @@ Pour protéger le coffre-fort Terraform (S3/DynamoDB) d'une destruction accident
 │   └── frontend/               # Code source Vue.js
 │
 └── .github/workflows/ci.yml    # 🤖 PIPELINE CI : terraform validate/plan sur 01-vpc/
+
+## ⚙️ Comment reproduire ce projet (Quick Start)
+
+*Prérequis : AWS CLI authentifié et Terraform installé en local.*
+
+**1. Déployer les fondations (Remote State)**
+```bash
+cd 00-backend
+terraform init
+terraform apply -auto-approve
+
+**2. Déployer l'infrastructure réseau et applicative**
+
+```bash
+cd ../01-vpc
+terraform init
+# Les adresses IP publiques de Grafana et du Frontend s'afficheront dans les Outputs.
+terraform apply
+
+**3. Nettoyage FinOps (Destruction)**
+Pour éviter toute facturation AWS inutile, détruire l'environnement réseau après utilisation :
+
+```bash
+terraform destroy
+
+(Note : Ne jamais lancer cette commande dans le dossier 00-backend sous peine de détruire le fichier d'état !)
+
