@@ -35,6 +35,15 @@ build {
   # Prendre le moule temporaire défini en haut
   sources =["source.amazon-ebs.backend-ami"]
 
+  # Préparation (On attend qu'AWS soit prêt et on crée le dossier)
+  provisioner "shell" {
+    inline = [
+      "echo 'Attente de la fin de cloud-init...'",
+      "cloud-init status --wait",
+      "mkdir -p /home/ubuntu/backend_app"
+    ]
+  }
+
   # Livrer les fichiers locaux de manière sécurisée dans le disque dur de la machine temporaire AWS
   provisioner "file" {
     source = "../02-app/backend/"
@@ -46,7 +55,8 @@ build {
   provisioner "shell" {
     inline = [
       "sudo apt-get update -y",
-      "sudo apt-get install -y docker.io",
+      # DEBIAN_FRONTEND=noninteractive empêche les pop-ups Ubuntu de bloquer l'installation
+      "sudo DEBIAN_FRONTEND=noninteractive apt-get install -y docker.io",
       "cd /home/ubuntu/backend_app",
       "sudo docker build -t iac-backend ."
     ]
