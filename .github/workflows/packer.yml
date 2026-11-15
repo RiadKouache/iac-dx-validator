@@ -1,4 +1,4 @@
-name: 'Pacler AMI Bakery CI/CD Pipeline'
+name: 'Packer AMI Bakery CI/CD Pipeline'
 
 # Le pipeline se déclenche manuellement (workflow_dispatch)
 # ou si on modifie des fichiers dans le dossier 03-packer

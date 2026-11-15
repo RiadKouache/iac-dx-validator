@@ -39,7 +39,7 @@ build {
   provisioner "file" {
     source = "../02-app/backend/"
     # Dossier uploader 
-    destination = "/tmp/backend" 
+    destination = "/home/ubuntu/backend_app" 
   }
 
   # Runner des commandes Linux sur la machine AWS
@@ -47,7 +47,7 @@ build {
     inline = [
       "sudo apt-get update -y",
       "sudo apt-get install -y docker.io",
-      "cd /tmp/backend",
+      "cd /home/ubuntu/backend_app",
       "sudo docker build -t iac-backend ."
     ]
   }
