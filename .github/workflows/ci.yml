@@ -5,11 +5,23 @@ on:
   push:
     branches:
       - main
+    # 1. Ignorer les dossiers Packer et App lors d'un push classique
+    paths-ignore:
+      - '03-packer/**'
+      - '02-app/backend/**'
+    # 2. Écouter la fin du pipeline Packer
+    workflow_run:
+      workflows: ["Packer AMI Bakery CI/CD Pipeline"]
+      types:
+        - completed
 
 jobs:
   terraform:
     name: 'Terraform Validation & Plan'
     runs-on: ubuntu-latest
+
+    # 3. Condition SRE : Ne s'exécute que si c'est un push direct, OU si le pipeline Packer a réussi (pas en cas d'échec)
+    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
 
     # Faire en sorte que les commandes (run) s'exécutent dans le dossier voulu 
     defaults:
