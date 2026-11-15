@@ -1,0 +1,51 @@
+name: 'Pacler AMI Bakery CI/CD Pipeline'
+
+# Le pipeline se déclenche manuellement (workflow_dispatch)
+# ou si on modifie des fichiers dans le dossier 03-packer
+
+on:
+  push:
+   # Si les fichiers poussés se trouvent dans les dossiers listés
+    paths:
+      - '03-packer/**'
+      - '02-app/backend/**'
+  # Déclenchement de la pipeline manuellement (parfois indispensable pour packer)
+  workflow_dispatch:
+
+jobs:
+  build-golden-image:
+    name: 'Build Backend AMI'
+    runs-on: ubuntu-latest
+
+    # On se déplace sur le dossier Packer
+    defaults:
+      run:
+        working-directory: ./03-packer
+    steps:
+      - name: 'Checkout du code'
+        uses: actions/checkout@v4
+
+      - name: 'Installation de Packer'
+        uses: hashicorp/setup-packer@main
+        with:
+          version: '1.9.4' # Une version stable récente
+
+      - name: 'Configuration AWS Credentials'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-3
+
+      - name: 'Packer Init'
+        run: packer init .
+
+      - name: 'Packer Format'
+        run: packer fmt .
+
+
+      - name: 'Packer Validate'
+        run: packer validate .
+
+      - name: 'Packer Build'
+        run: packer build .
