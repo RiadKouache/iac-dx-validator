@@ -33,7 +33,7 @@ source "amazon-ebs" "backend-ami" {
 
 build {
   # Prendre le moule temporaire défini en haut
-  sources =["source.amazon-ebs.backend_ami"]
+  sources =["source.amazon-ebs.backend-ami"]
 
   # Livrer les fichiers locaux de manière sécurisée dans le disque dur de la machine temporaire AWS
   provisioner "file" {
