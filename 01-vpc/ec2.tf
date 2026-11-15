@@ -1,9 +1,20 @@
 # Fichier: ec2.tf
 
+# Recherche dynamique de la Golden Image du Backend
+data "aws_ami" "packer_backend_ami" {
+  most_recent = true
+  owners      = ["self"] # Cherche uniquement dans ton compte AWS (sécurité)
+
+  filter {
+    name   = "name"
+    values = ["iac-backend-golden-image-*"] # L'étoile englobe le timestamp
+  }
+}
+
 # Serveur Backend (Privé)
 resource "aws_instance" "backend_server" {
   # AMI d'un OS Linux standard sur la région eu-west-3 (Paris)
-  ami           = "ami-05b5a865c3579bbc4"
+  ami           = data.aws_ami.packer_backend_ami.id
   instance_type = "t3.micro"
 
   # On le place dans le subnet privé
